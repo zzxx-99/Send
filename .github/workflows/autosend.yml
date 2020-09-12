@@ -1,0 +1,46 @@
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Python AutoSendSafe
+
+on:
+  # 发生push或PR事件会触发Actions
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  # 国际标准时间21点，即北京时间第二天早上5点
+  # 国际标准时间每天20:12、22:12，即北京时间第二天早上4:12、6:12
+  schedule:
+    # - cron: '0 21 * * *'
+    # - cron: '12 20-23/2 * * *'
+
+jobs:
+  install_dependencies_and_autosend:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # python-version: [3.5, 3.6, 3.7, 3.8]
+        python-version: [3.7]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    # 安装依赖
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        # 从requirements.txt文件中安装依赖
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    # 运行脚本
+    - name: Run
+      # 使用Secrets隔离敏感信息，发送方邮箱和POP3授权码
+      env:
+        fromEmail: ${{ secrets.FROMEMAIL }}
+        pop3Key: ${{ secrets.POP3KEY }}
+      run: |
+        python send.py -f "$fromEmail" -k "$pop3Key"
