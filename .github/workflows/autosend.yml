@@ -13,7 +13,7 @@ on:
   # 国际标准时间每天20:12、22:12，即北京时间第二天早上4:12、6:12
   schedule:
     # - cron: '0 21 * * *'
-    # - cron: '12 20-23/2 * * *'
+     - cron: '12 20-23/2 * * *'
 
 jobs:
   install_dependencies_and_autosend:
